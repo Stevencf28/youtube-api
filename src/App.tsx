@@ -8,7 +8,7 @@ function App() {
 	return (
 		<Router>
 			<Header />
-			<div className='min-h-full w-full'>
+			<div className='content'>
 				<Routes>
 					<Route path='/' element={<Home />} />
 				</Routes>

@@ -3,17 +3,9 @@ body {
 	color: rgb(255, 255, 255);
 }
 
-header,
-footer {
-	color: white;
-	background-color: rgb(33, 33, 33);
-}
-
-footer {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	height: 2.5rem;
+.content {
+	@apply min-h-screen w-full h-full;
+	@apply flex justify-center;
 }
 
 .card {

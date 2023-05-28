@@ -1,0 +1,7 @@
+header {
+	position: sticky;
+	position: -webkit-sticky;
+	top: 0;
+	color: white;
+	background-color: rgb(33, 33, 33);
+}
