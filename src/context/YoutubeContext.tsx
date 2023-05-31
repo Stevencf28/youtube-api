@@ -1,20 +1,37 @@
-import { ReactNode, createContext } from "react";
-import { Youtube } from "../services/Youtube";
-import { YoutubeClient } from "../services/YoutubeClient";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import YoutubeClient from "../services/YoutubeClient";
 
-interface Props {
-	children: ReactNode;
+const YoutubeContext = createContext<YoutubeClient | undefined>(undefined);
+
+interface YoutubeContextProviderProps {
+	apiKey: string;
+	children: React.ReactNode;
 }
 
-export const YoutubeContext = createContext({} as Youtube);
+export function YoutubeContextProvider({
+	apiKey,
+	children,
+}: YoutubeContextProviderProps): JSX.Element {
+	const [youtubeClient, setYoutubeClient] = useState<YoutubeClient>();
 
-export const YoutubeProvider: React.FC<Props> = ({ children }) => {
-	const client = new YoutubeClient();
-	const youtube = new Youtube(client);
+	useEffect(() => {
+		const client = new YoutubeClient(apiKey);
+		setYoutubeClient(client);
+	}, [apiKey]);
 
 	return (
-		<YoutubeContext.Provider value={youtube}>
+		<YoutubeContext.Provider value={youtubeClient}>
 			{children}
 		</YoutubeContext.Provider>
 	);
-};
+}
+
+export function useYoutubeClient(): YoutubeClient {
+	const youtubeClient = useContext(YoutubeContext);
+	if (!youtubeClient) {
+		throw new Error(
+			"useYoutubeClient must be used within a YoutubeContextProvider"
+		);
+	}
+	return youtubeClient;
+}

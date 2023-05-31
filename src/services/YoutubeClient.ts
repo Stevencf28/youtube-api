@@ -1,18 +1,33 @@
-import axios, { AxiosInstance } from "axios";
+import { google, youtube_v3 } from "googleapis";
 
-const BASE_URL = "https://www.googleapis.com/youtube/v3";
+export default class YoutubeClient {
+	private readonly youtube: youtube_v3.Youtube;
 
-export class YoutubeClient {
-	private http: AxiosInstance;
-
-	constructor() {
-		this.http = axios.create({
-			baseURL: BASE_URL,
-		});
+	constructor(apiKey: string) {
+		this.youtube = google.youtube({ version: "v3", auth: apiKey });
 	}
 
-	async get(path: string, config: any): Promise<any> {
-		const response = await this.http.get(path, config);
+	async searchVideos(
+		query: string
+	): Promise<youtube_v3.Schema$SearchListResponse | undefined> {
+		const response = await this.youtube.search.list({
+			part: ["id", "snippet"],
+			q: query,
+			type: ["video"],
+			maxResults: 16,
+		});
+		return response.data;
+	}
+
+	async getSuggestedVideos(): Promise<
+		youtube_v3.Schema$SearchListResponse | undefined
+	> {
+		const response = await this.youtube.search.list({
+			part: ["id", "snippet"],
+			type: ["video"],
+			maxResults: 16,
+			regionCode: "CA",
+		});
 		return response.data;
 	}
 }
