@@ -3,12 +3,12 @@ import "./App.css";
 import Home from "./pages/Home";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { YoutubeProvider } from "./context/YoutubeContext";
+import { YoutubeContextProvider } from "./context/YoutubeContext";
 
 function App() {
 	return (
 		<Router>
-			<YoutubeProvider>
+			<YoutubeContextProvider>
 				<Header />
 				<div className='content'>
 					<Routes>
@@ -16,7 +16,7 @@ function App() {
 					</Routes>
 				</div>
 				<Footer />
-			</YoutubeProvider>
+			</YoutubeContextProvider>
 		</Router>
 	);
 }

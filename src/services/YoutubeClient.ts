@@ -1,33 +1,82 @@
-import { google, youtube_v3 } from "googleapis";
+import axios, { AxiosInstance } from "axios";
+
+const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
+
+export type Video = {
+	id: string;
+	snippet: {
+		title: string;
+		thumbnails: {
+			standard: {
+				url: string;
+				height: number;
+				width: number;
+			};
+		};
+		description: string;
+		channelTitle: string;
+	};
+	statistics: {
+		viewCount: string;
+		likeCount: string;
+		dislikeCount: string;
+	};
+	player: {
+		embedHtml: string;
+	};
+};
+
+type SearchResults = {
+	items: Video[];
+};
 
 export default class YoutubeClient {
-	private readonly youtube: youtube_v3.Youtube;
+	private client: AxiosInstance;
 
-	constructor(apiKey: string) {
-		this.youtube = google.youtube({ version: "v3", auth: apiKey });
+	constructor() {
+		this.client = axios.create({
+			baseURL: "https://www.googleapis.com/youtube/v3/",
+			params: {
+				key: YOUTUBE_API_KEY,
+			},
+		});
 	}
 
-	async searchVideos(
-		query: string
-	): Promise<youtube_v3.Schema$SearchListResponse | undefined> {
-		const response = await this.youtube.search.list({
-			part: ["id", "snippet"],
-			q: query,
-			type: ["video"],
-			maxResults: 16,
+	public async getSuggestedVideos(): Promise<Video[]> {
+		const response = await this.client.get("/videos", {
+			params: {
+				part: "snippet, statistics",
+				chart: "mostPopular",
+				maxResults: 32,
+			},
 		});
-		return response.data;
+		const videos: Video[] = response.data.items;
+		return videos;
+	}
+	public async getVideo(videoId: string): Promise<Video> {
+		const response = await this.client.get("/videos", {
+			params: {
+				id: videoId,
+				part: "snippet, statistics, player",
+				maxResults: 1,
+			},
+		});
+
+		const video: Video = response.data.items[0];
+		return video;
 	}
 
-	async getSuggestedVideos(): Promise<
-		youtube_v3.Schema$SearchListResponse | undefined
-	> {
-		const response = await this.youtube.search.list({
-			part: ["id", "snippet"],
-			type: ["video"],
-			maxResults: 16,
-			regionCode: "CA",
+	public async searchVideos(query: string): Promise<Video[]> {
+		const response = await this.client.get("/search", {
+			params: {
+				part: "snippet",
+				maxResults: 32,
+				q: query,
+				type: "video",
+			},
 		});
-		return response.data;
+		const results: SearchResults = response.data.items;
+		const videos: Video[] = results.items;
+		return videos;
 	}
 }
