@@ -13,12 +13,12 @@ export default function Header() {
 	};
 	return (
 		<>
-			<header className='w-full flex flex-wrap sm:flex-nowrap items-center sm:justify-evenly justify-between mb-4 p-4 text-2xl'>
+			<header className='w-full flex flex-wrap sm:flex-nowrap items-center justify-between mb-4 p-4 text-2xl'>
 				<NavLink to='/' className='order-1 font-semibold'>
 					SCTube
 				</NavLink>
 				<form
-					className='flex flex-grow justify-center order-2 sm:px-2 mt-4 sm:mt-0 sm:max-w-md'
+					className='flex flex-auto justify-center w-full order-2 sm:px-2 mt-4 sm:mt-0 sm:max-w-lg'
 					onSubmit={handlesubmit}
 				>
 					<input
