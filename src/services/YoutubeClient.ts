@@ -5,9 +5,10 @@ const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 export type Video = {
 	id: string;
 	snippet: {
+		publishedAt: string;
 		title: string;
 		thumbnails: {
-			standard: {
+			high: {
 				url: string;
 				height: number;
 				width: number;
@@ -25,6 +26,21 @@ export type Video = {
 		embedHtml: string;
 	};
 };
+
+export const videoCategories = [
+	{ id: "1", name: "Film & Animation", current: false },
+	{ id: "2", name: "Autos & Vehicles", current: false },
+	{ id: "10", name: "Music", current: false },
+	{ id: "15", name: "Pets & Animals", current: false },
+	{ id: "17", name: "Sports", current: false },
+	{ id: "20", name: "Gaming", current: false },
+	{ id: "22", name: "People & Blogs", current: false },
+	{ id: "23", name: "Comedy", current: false },
+	{ id: "24", name: "Entertainment", current: false },
+	{ id: "25", name: "News & Politics", current: false },
+	{ id: "26", name: "Howto & Style", current: false },
+	{ id: "28", name: "Science & Technology", current: false },
+];
 
 type SearchResults = {
 	items: Video[];
@@ -47,6 +63,21 @@ export default class YoutubeClient {
 			params: {
 				part: "snippet, statistics",
 				chart: "mostPopular",
+				maxResults: 32,
+			},
+		});
+		const videos: Video[] = response.data.items;
+		return videos;
+	}
+
+	public async getSuggestedVideosByCategory(
+		categoryId: string
+	): Promise<Video[]> {
+		const response = await this.client.get("/videos", {
+			params: {
+				part: "snippet, statistics",
+				chart: "mostPopular",
+				videoCategoryId: categoryId,
 				maxResults: 32,
 			},
 		});

@@ -9,13 +9,13 @@ function App() {
 	return (
 		<Router>
 			<YoutubeContextProvider>
-				<Header />
 				<div className='content'>
+					<Header />
 					<Routes>
 						<Route path='/' element={<Home />} />
 					</Routes>
+					<Footer />
 				</div>
-				<Footer />
 			</YoutubeContextProvider>
 		</Router>
 	);

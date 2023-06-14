@@ -1,11 +1,23 @@
 body {
 	background-color: rgb(18, 18, 18);
 	color: rgb(255, 255, 255);
+	@apply font-sans;
 }
 
 .content {
-	@apply min-h-screen w-full h-full;
+	@apply w-full h-full;
 	@apply flex justify-center;
+	display: block;
+}
+
+.menu-top {
+	top: 128px;
+}
+
+@media (min-width: 768px) {
+	.menu-top {
+		top: 72px;
+	}
 }
 
 .card {
@@ -13,6 +25,14 @@ body {
 
 .btn {
 	background-color: rgb(61, 61, 61);
+}
+
+.btn:hover {
+	background-color: rgb(41, 41, 41);
+}
+
+.btn:active {
+	background-color: rgb(26, 26, 26);
 }
 
 .primary-text {
