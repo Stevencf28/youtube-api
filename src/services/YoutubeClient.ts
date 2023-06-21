@@ -27,20 +27,11 @@ export type Video = {
 	};
 };
 
-export const videoCategories = [
-	{ id: "1", name: "Film & Animation", current: false },
-	{ id: "2", name: "Autos & Vehicles", current: false },
-	{ id: "10", name: "Music", current: false },
-	{ id: "15", name: "Pets & Animals", current: false },
-	{ id: "17", name: "Sports", current: false },
-	{ id: "20", name: "Gaming", current: false },
-	{ id: "22", name: "People & Blogs", current: false },
-	{ id: "23", name: "Comedy", current: false },
-	{ id: "24", name: "Entertainment", current: false },
-	{ id: "25", name: "News & Politics", current: false },
-	{ id: "26", name: "Howto & Style", current: false },
-	{ id: "28", name: "Science & Technology", current: false },
-];
+export type Category = {
+	id: string;
+	name: string;
+	current: boolean;
+};
 
 type SearchResults = {
 	items: Video[];
@@ -58,12 +49,35 @@ export default class YoutubeClient {
 		});
 	}
 
+	public async getVideoCategories(): Promise<Category[]> {
+		const response = await this.client.get("/videoCategories", {
+			params: {
+				part: "snippet",
+				regionCode: "US",
+				hl: "en_US",
+			},
+		});
+		// these are non-working categories that Youtube API listed as assignable when they aren't.
+		const excludedIds = ["19", "27", "29"];
+		// api doesn't return with current, current is meant for determining if a category is currently active in the front-end
+		const categories: Category[] = response.data.items
+			.filter(
+				(item: any) => item.snippet.assignable && !excludedIds.includes(item.id)
+			) // Filter out items with assignable set to false or with excluded IDs
+			.map((item: any) => ({
+				id: item.id,
+				name: item.snippet.title,
+				current: false, // Set the current value to false for each category
+			}));
+		return categories;
+	}
+
 	public async getSuggestedVideos(): Promise<Video[]> {
 		const response = await this.client.get("/videos", {
 			params: {
 				part: "snippet, statistics",
 				chart: "mostPopular",
-				maxResults: 32,
+				maxResults: 31,
 			},
 		});
 		const videos: Video[] = response.data.items;
@@ -78,12 +92,26 @@ export default class YoutubeClient {
 				part: "snippet, statistics",
 				chart: "mostPopular",
 				videoCategoryId: categoryId,
-				maxResults: 32,
+				maxResults: 31,
 			},
 		});
 		const videos: Video[] = response.data.items;
 		return videos;
 	}
+
+	public async getSuggestedRelatedVideos(categoryId: string): Promise<Video[]> {
+		const response = await this.client.get("/videos", {
+			params: {
+				part: "snippet, statistics",
+				chart: "mostPopular",
+				videoCategoryId: categoryId,
+				maxResults: 31,
+			},
+		});
+		const videos: Video[] = response.data.items;
+		return videos;
+	}
+
 	public async getVideo(videoId: string): Promise<Video> {
 		const response = await this.client.get("/videos", {
 			params: {
@@ -101,7 +129,7 @@ export default class YoutubeClient {
 		const response = await this.client.get("/search", {
 			params: {
 				part: "snippet",
-				maxResults: 32,
+				maxResults: 31,
 				q: query,
 				type: "video",
 			},
